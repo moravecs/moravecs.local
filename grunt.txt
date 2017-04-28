@@ -1,0 +1,216 @@
+module.exports = function(grunt) {
+  // configura las tareas
+  grunt.initConfig({
+ 
+processhtml: {
+  build: {
+      options: {
+        process: true,
+        data: {
+          title: 'Moravecs',
+          message: 'This is production distribution'
+        },
+      },
+    files: {
+      'dist/index.php': ['src/index.php']
+    },
+  },
+},
+
+copy: {
+      build: {
+        cwd: 'src',
+        src: [ '**' ],
+        dest: 'dist',
+        expand: true
+      },
+    },
+ 
+clean: {
+  build: {
+    src: [ 'dist' ]
+  },
+},
+
+connect: {
+  server: {
+    options: {
+      port: 3000,
+      base: 'dist',
+      hostname: '*'
+    },
+  },
+},
+
+watch: {
+	options: {
+      livereload: true,
+    },
+  copy: {
+    files: [ 'src/**' ],
+    tasks: [ 'copy', 'processhtml', 'cssmin' ]
+  },
+    config: {
+        files: ['package.json', 'gruntfile.js'],
+        tasks: ['exit']
+    },
+
+},
+
+cssmin: {
+  target: {
+    files: [{
+      expand: true,
+      cwd: 'src/css',
+      src: ['*.css', '!*.min.css'],
+      dest: 'src/css',
+      dest: 'src/css',
+      ext: '.min.css'
+    }]
+  },
+},
+
+//cssmin: {
+//  build: {
+//    files: {
+//      'dist/css/style.css': [ 'dist/**/*.css' ]
+//    },
+//  },
+//},
+
+clean: {
+  build: {
+    src: [ 'dist' ]
+  },
+  stylesheets: {
+    src: [ 'dist/**/*.css', '!dist/css/style.css' ]
+  },
+},
+
+//coffee: {
+//  build: {
+//    expand: true,
+//    cwd: 'src',
+//    src: [ '**/*.coffee' ],
+//    dest: 'dist',
+//    ext: '.js'
+//  }
+//},
+
+
+uglify: {
+  build: {
+    options: {
+      mangle: false
+    },
+    files: {
+      'dist/js/application.js': [ 'src/**/*.js' ]
+    },
+  },
+},
+
+clean: {
+  build: {
+    src: [ 'dist' ]
+  },
+  stylesheets: {
+    src: [ 'dist/**/*.css', '!dist/css/style.css' ]
+  },
+  scripts: {
+    src: [ 'dist/**/*.js', '!dist/application.js' ]
+  },
+},
+
+imagemin: {
+   dist: {
+      options: {
+        optimizationLevel: 5
+      },
+      files: [{
+         expand: true,
+         cwd: 'src/img',
+         src: ['**/*.{png,jpg,gif}'],
+         dest: 'dist/img'
+      }]
+   },
+},
+
+
+uncss: {
+   dist: {
+	   options: {
+         ignore: [/js-.+/, '.special-class'],
+         ignoreSheets: [/fonts.googleapis/],
+      },
+      files: {
+         'dist/css/tidy.css': ['src/index.php']
+      }
+   }
+}
+
+  });
+ 
+grunt.registerTask(
+  'default',
+  'Vigila los cambios en el proyecto y automáticamente copia los archivos y lanza el servidor de prueba.',
+  [ 'clean', 'imagemin', 'uglify', 'cssmin',  'copy', 'uncss', 'processhtml', 'connect', 'watch' ]
+);
+
+//grunt.registerTask(  
+//  'build', 
+//  'Copia todos los archivos fuente al directorio de distribución y compila las hojas de estilo con less.', 
+//  [ 'clean', 'copy', 'stylesheets' ]
+//);
+// 
+// 
+//
+//
+//grunt.registerTask(
+//  'stylesheets', 
+//  'Compila las hojas de estilo.', 
+//  [ 'cssmin', 'clean:stylesheets' ]
+//);
+//
+//grunt.registerTask(
+//  'scripts', 
+//  'Compila los archivos JavaScript.', 
+//  [ 'coffee' ]
+//);
+// 
+//grunt.registerTask(  
+//  'build', 
+//  'Copia todos los archivos fuente al directorio de distribución, compila las hojas de estilo con less y los coffeescript a javascript.', 
+//  [ 'clean', 'copy', 'stylesheets', 'scripts' ]
+//);
+
+//grunt.registerTask(
+//  'scripts', 
+//  'Compila los archivos JavaScript.', 
+//  [ 'coffee', 'uglify' ]
+//);
+//
+//grunt.registerTask(
+//  'scripts', 
+//  'Compila los archivos JavaScript.', 
+//  [ 'coffee', 'uglify', 'clean:scripts' ]
+//);
+
+grunt.registerTask(
+	'exit', 'Just exits.', function() {
+		process.exit(0);
+});
+
+  // carga las tareas
+grunt.loadNpmTasks('grunt-processhtml');
+grunt.loadNpmTasks('grunt-contrib-copy');
+grunt.loadNpmTasks('grunt-contrib-cssmin');
+grunt.loadNpmTasks('grunt-contrib-clean');
+grunt.loadNpmTasks('grunt-contrib-connect');
+grunt.loadNpmTasks('grunt-contrib-watch');
+grunt.loadNpmTasks('grunt-contrib-coffee');
+grunt.loadNpmTasks('grunt-contrib-uglify');
+grunt.loadNpmTasks('grunt-uncss');
+grunt.loadNpmTasks('grunt-contrib-imagemin');
+
+  // define los comandos para las tareas
+};
